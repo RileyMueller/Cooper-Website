@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import Router from 'next/router';
+import { useSession } from 'next-auth/react';
 
 const Draft: React.FC = () => {
+
+  const { data: session } = useSession();
+
+  if (!session) {
+    return (
+      <Layout>
+        <h1>Create</h1>
+        <div>You need to be authenticated to view this page.</div>
+      </Layout>
+    );
+  }
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
   const submitData = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     try {
-      const body = { title, content };
+      const email = session.user.email;
+      const body = { title, content, email };
       await fetch('/api/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
