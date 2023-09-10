@@ -1,211 +1,117 @@
-import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { signOut, useSession } from 'next-auth/react';
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { signOut, useSession } from "next-auth/react";
+import styled from "styled-components";
 
-const Header: React.FC = () => {
-  const router = useRouter();
-  const isActive: (pathname: string) => boolean = (pathname) =>
-    router.pathname === pathname;
+const Nav = styled.nav`
+    display: flex;
+    padding: 2rem;
+    align-items: center;
+`;
 
-  const { data: session, status } = useSession();
+const Links = styled.div`
+    text-decoration: none;
+    color: ${({ theme }) => theme.colors.foreground};
+    display: inline-block;
+`;
 
-  let left = (
-    <div className="left">
-      <Link href="/" legacyBehavior>
-        <a className="bold" data-active={isActive('/')}>
-          Feed
-        </a>
-      </Link>
-      <style jsx>{`
-        .bold {
-          font-weight: bold;
-        }
+const BoldLink = styled(Links)`
+    font-weight: bold;
+    font-size: 20px;
+`;
 
-        a {
-          text-decoration: none;
-          color: var(--geist-foreground);
-          display: inline-block;
-        }
+// Add this Dropdown component to wrap non-Feed items
+const Dropdown = styled.div`
+    position: relative;
+    display: inline-block;
+    margin-left: auto;
 
-        .left a[data-active='true'] {
-          color: gray;
-        }
+    div {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: ${({ theme }) => theme.colors.background};
+        border: 1px solid ${({ theme }) => theme.colors.foreground};
+        border-radius: 3px;
+        padding: 0.5rem 1rem;
 
-        a + a {
-          margin-left: 1rem;
-        }
-      `}</style>
-    </div>
-  );
-
-  let right = null;
-
-  if (status === 'loading') {
-    left = (
-      <div className="left">
-        <Link href="/" legacyBehavior>
-          <a className="bold" data-active={isActive('/')}>
-            Feed
-          </a>
-        </Link>
-        <style jsx>{`
-          .bold {
-            font-weight: bold;
-          }
-
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          .left a[data-active='true'] {
-            color: gray;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-        `}</style>
-      </div>
-    );
-    right = (
-      <div className="right">
-        <p>Validating session ...</p>
-        <style jsx>{`
-          .right {
-            margin-left: auto;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  if (!session) {
-    right = (
-      <div className="right">
-        <Link href="/api/auth/signin" legacyBehavior>
-          <a data-active={isActive('/signup')}>Log in</a>
-        </Link>
-        <style jsx>{`
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-
-          .right {
-            margin-left: auto;
-          }
-
-          .right a {
-            border: 1px solid var(--geist-foreground);
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  if (session) {
-    left = (
-      <div className="left">
-        <Link href="/" legacyBehavior>
-          <a className="bold" data-active={isActive('/')}>
-            Feed
-          </a>
-        </Link>
-        <Link href="/drafts" legacyBehavior>
-          <a data-active={isActive('/drafts')}>My drafts</a>
-        </Link>
-        <style jsx>{`
-          .bold {
-            font-weight: bold;
-          }
-
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          .left a[data-active='true'] {
-            color: gray;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-        `}</style>
-      </div>
-    );
-    right = (
-      <div className="right">
-        <p>
-          {session.user.name} ({session.user.email})
-        </p>
-        <Link href="/create" legacyBehavior>
-          <button>
-            <a>New post</a>
-          </button>
-        </Link>
-        <button onClick={() => signOut()}>
-          <a>Log out</a>
-        </button>
-        <style jsx>{`
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          p {
-            display: inline-block;
+        p {
+            display: block;
             font-size: 13px;
             padding-right: 1rem;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-
-          .right {
-            margin-left: auto;
-          }
-
-          .right a {
-            border: 1px solid var(--geist-foreground);
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-          }
-
-          button {
-            border: none;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  return (
-    <nav>
-      {left}
-      {right}
-      <style jsx>{`
-        nav {
-          display: flex;
-          padding: 2rem;
-          align-items: center;
         }
-      `}</style>
-    </nav>
-  );
+
+        button {
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        &:hover {
+            display: block;
+        }
+    }
+
+    &:hover div {
+        display: block;
+    }
+`;
+
+const Header: React.FC = () => {
+    const router = useRouter();
+    const isActive: (pathname: string) => boolean = (pathname) => router.pathname === pathname;
+
+    const { data: session, status } = useSession();
+
+    let right = null;
+
+    // the dropdown now wraps around all non-Feed items
+    if (status === "loading") {
+        right = (
+            <Dropdown>
+                <p>Validating session ...</p>
+            </Dropdown>
+        );
+    }
+
+    if (!session) {
+        right = (
+            <Dropdown>
+                <Link href="/api/auth/signin" data-active={isActive("/signup")}>
+                    Log in
+                </Link>
+            </Dropdown>
+        );
+    }
+
+    if (session) {
+        right = (
+            <Dropdown>
+                <p>
+                    {session.user.name} ({session.user.email})
+                </p>
+                <Link href="/create">
+                    <button>
+                        New post
+                    </button>
+                </Link>
+                <button onClick={() => signOut()}>
+                    Log out
+                </button>
+            </Dropdown>
+        );
+    }
+
+    return (
+        <Nav>
+            <BoldLink>
+                <Link href="/" data-active={isActive("/")}>
+                    Feed
+                </Link>
+            </BoldLink>
+            {right}
+        </Nav>
+    );
 };
 
 export default Header;
