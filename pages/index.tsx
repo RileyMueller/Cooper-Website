@@ -16,17 +16,26 @@ export const getStaticProps: GetStaticProps = async () => {
       },
     }
   });
+  const gallery = (await prisma.image.findMany({})).map(image=>{
+    return {
+      ...image,
+      uploadDate: image.uploadDate.toISOString(),
+    }
+  })
+  
   return { 
-    props: { feed }, 
+    props: { feed, gallery }, 
     revalidate: 10 
   }
 }
 
 type Props = {
   feed: PostProps[]
+  gallery: any
 }
 
 const Blog: React.FC<Props> = (props) => {
+  console.log(props.gallery);
   return (
     <Layout>
       <div className="page">
@@ -36,6 +45,12 @@ const Blog: React.FC<Props> = (props) => {
             <div key={post.id} className="post">
               <Post post={post} />
             </div>
+          ))}
+          {props.gallery.length > 0 && props.gallery.map((image) => (
+            <img
+              src={`https://res.cloudinary.com/${process.env.CLOUD_NAME}/v${image.version}/${image.c_id}.${image.format}`}
+              key={image.c_id}
+            />
           ))}
         </main>
       </div>

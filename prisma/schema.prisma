@@ -17,6 +17,17 @@ model Post {
   authorId  String?
 }
 
+model Image {
+  id          String @id @default(cuid())
+  c_id        String
+  title       String @unique
+  description String?
+  format      String
+  version     String
+  published   Boolean @default(false)
+  uploadDate  DateTime
+}
+
 model Account {
   id                 String  @id @default(cuid())
   userId             String  @map("user_id")

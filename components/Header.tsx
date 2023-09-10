@@ -90,9 +90,14 @@ const Header: React.FC = () => {
                 <p>
                     {session.user.name} ({session.user.email})
                 </p>
-                <Link href="/create">
+                <Link href="/create" data-active={isActive("/create")}>
                     <button>
                         New post
+                    </button>
+                </Link>
+                <Link href="/upload" data-active={isActive("/upload")}>
+                    <button>
+                        Upload Image
                     </button>
                 </Link>
                 <button onClick={() => signOut()}>

@@ -19,7 +19,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
   });
   return {
-    props: post,
+    // errors if props is undefined
+    props: post ? post : {},
   };
 };
 
