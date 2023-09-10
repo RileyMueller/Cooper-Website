@@ -111,7 +111,7 @@ const Header: React.FC = () => {
         <Nav>
             <BoldLink>
                 <Link href="/" data-active={isActive("/")}>
-                    Feed
+                    Home
                 </Link>
             </BoldLink>
             {right}

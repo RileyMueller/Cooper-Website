@@ -1,23 +1,12 @@
 import React from "react"
 import { GetStaticProps } from "next"
 import Layout from "../components/Layout"
-import Post, { PostProps } from "../components/Post"
+import Gallery from "../components/Gallery"
 import Image, { ImageProps } from "../components/Image"
 import prisma from "../lib/prisma"
 
 export const getStaticProps: GetStaticProps = async () => {
-  const feed = await prisma.post.findMany({
-    // only include Posts where published is true
-    where: {published : true},
-    include: {
-      // author is a ref to a User
-      author: {
-        // Users have a name attribute and we want that included as well.
-        select: { name: true},
-      },
-    }
-  });
-  const gallery = (await prisma.image.findMany({})).map(image=>{
+    const gallery = (await prisma.image.findMany({})).map(image=>{
     return {
       ...image,
       uploadDate: image.uploadDate.toISOString(),
@@ -25,27 +14,22 @@ export const getStaticProps: GetStaticProps = async () => {
   })
   
   return { 
-    props: { feed, gallery }, 
+    props: { gallery }, 
     revalidate: 10 
   }
 }
 
 type Props = {
-  feed: PostProps[]
   gallery: ImageProps[]
 }
 
-const Blog: React.FC<Props> = (props) => {
+const PersonalGallery: React.FC<Props> = (props) => {
   return (
     <Layout>
       <div className="page">
-        <h1>Public Feed</h1>
+        <h1>Gallery</h1>
         <main>
-          {props.feed.map((post) => (
-            <div key={post.id} className="post">
-              <Post post={post} />
-            </div>
-          ))}
+            <Gallery images={props.gallery}/>
         </main>
       </div>
       <style jsx>{`
@@ -66,4 +50,4 @@ const Blog: React.FC<Props> = (props) => {
   )
 }
 
-export default Blog
+export default PersonalGallery;
