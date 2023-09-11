@@ -7,6 +7,11 @@ type Props = {
     image: ImageProps;
 };
 const Edit: React.FC<Props> = (props) => {
+
+    if (!props.image) {
+        return;
+    }
+
     const [title, setTitle] = useState(props.image.title);
     const [description, setDescription] = useState(props.image.description);
     const [imageUploaded, setImageUploaded] = useState();
