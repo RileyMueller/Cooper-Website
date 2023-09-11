@@ -1,35 +1,46 @@
-import React from "react"
-import { GetStaticProps } from "next"
-import Layout from "../components/Layout"
-import Gallery from "../components/Gallery"
-import Image, { ImageProps } from "../components/Image"
-import prisma from "../lib/prisma"
+import React, { useState, useEffect } from "react";
+import { GetStaticProps } from "next";
+import Layout from "../components/Layout";
+import Gallery from "../components/Gallery";
+import { ImageProps } from "../components/Image";
+import prisma from "../lib/prisma";
 
 export const getStaticProps: GetStaticProps = async () => {
+  const gallery = await prisma.image.findMany({
+    
+    orderBy: {
+      uploadDate: 'desc',
+    },
+  });
 
-  const gallery = (await prisma.image.findMany({}));
-  
-  return { 
-    props: { gallery }, 
-    revalidate: 10 
-  }
-}
+  return {
+    props: { gallery },
+    revalidate: 10,
+  };
+};
 
 type Props = {
-  gallery: ImageProps[]
-}
+  gallery: ImageProps[];
+};
 
-const Blog: React.FC<Props> = (props) => {
+const Homepage: React.FC<Props> = (props) => {
+  const personalImages = props.gallery.filter(image => image.personal);
+  const professionalImages = props.gallery.filter(image => image.professional);
+
   return (
     <Layout>
       <div className="page">
         <h1>All Images</h1>
         <main>
-          <Gallery images={props.gallery}/>
+          <h2>Personal Images</h2>
+          <Gallery images={personalImages} />
+
+          <h2>Professional Images</h2>
+          <Gallery images={professionalImages} />
         </main>
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default Blog
+export default Homepage;

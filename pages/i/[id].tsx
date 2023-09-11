@@ -26,6 +26,13 @@ type Props = {
     image: ImageProps;
 };
 const Edit: React.FC<Props> = (props) => {
+
+    if (!props.image) {
+        return <div>
+            No image found, return to homepage
+        </div>;
+    }
+
     const [title, setTitle] = useState(props.image.title);
     const [description, setDescription] = useState(props.image.description);
     const [isPersonal, setIsPersonal] = useState(props.image.personal);

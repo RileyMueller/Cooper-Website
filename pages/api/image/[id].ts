@@ -1,6 +1,8 @@
 import prisma from '../../../lib/prisma';
 import { destroyImage } from '../../../lib/cloudinary';
 import { parseImageForm } from '../../../lib/imageparse';
+import { NextApiRequest, NextApiResponse } from "next";
+import { checkIsInSession } from '../auth/[...nextauth]';
 
 export const config = {
   api : {
@@ -10,8 +12,9 @@ export const config = {
 
 // DELETE /api/image/:id
 // PUT /api/image/:id
-export default async function handle(req, res) {
-  const imageId = req.query.id;
+export default checkIsInSession(
+  async (req: NextApiRequest, res: NextApiResponse) => {
+  const imageId = req.query.id as string;
   if (req.method === 'DELETE') {
     const c_id = await prisma.image.findUnique({
       select: { c_id: true},
@@ -53,4 +56,4 @@ export default async function handle(req, res) {
       `The HTTP ${req.method} method is not supported at this route.`,
     );
   }
-}
+});
