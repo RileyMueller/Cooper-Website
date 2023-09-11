@@ -6,12 +6,11 @@ import Image, { ImageProps } from "../components/Image"
 import prisma from "../lib/prisma"
 
 export const getStaticProps: GetStaticProps = async () => {
-    const gallery = (await prisma.image.findMany({})).map(image=>{
-    return {
-      ...image,
-      uploadDate: image.uploadDate.toISOString(),
-    }
-  })
+    const gallery = (await prisma.image.findMany({
+      where: {
+        personal: true
+      }
+    }));
   
   return { 
     props: { gallery }, 

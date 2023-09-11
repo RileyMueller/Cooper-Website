@@ -2,34 +2,20 @@ import { resolve } from 'path';
 import prisma from '../../../lib/prisma';
 import { IncomingForm } from "formidable";
 import { uploadImage } from '../../../lib/cloudinary';
+import { parseImageForm } from '../../../lib/imageparse';
 
 export const config = {
   api : {
     bodyParser: false,
-    // bodyParser: {
-    //   //sizeLimit: '4mb'
-    // }
   }
 }
 
-interface FormParseResults {
-  fields: any;
-  files: any;
-}
-
 // POST /api/image
-// Required fields in body: title
+// Required fields in body: title, personal, professional
 // Optional fields in body: description, published
 export default async function handle(req, res) {
 
-  const x: FormParseResults = await new Promise((resolve, reject)=>{
-    const form = new IncomingForm({keepExtensions: true});
-    form.parse(req, (err, fields, files)=>{
-        if (err) return reject(err);
-        resolve({fields, files});
-    });
-  });
-
+  const x = await parseImageForm(req);
   
   const imageData: any = await uploadImage(x.files['image'][0].filepath);
 
@@ -41,8 +27,12 @@ export default async function handle(req, res) {
       format: imageData.format,
       version: imageData.version.toString(),
       published: true,
-      uploadDate: new Date(),
+      uploadDate: (new Date()).toISOString(),
+      personal: x.fields.personal === 'true', //FormData converts booleans to strings.
+      professional: x.fields.professional === 'true'
     },
   });
-  res.json({});
+
+  // give time for cloudinary to populate the image address.
+  res.status(200).json({status: 'success'});
 }

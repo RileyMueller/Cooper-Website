@@ -7,6 +7,8 @@ const Upload = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUploaded, setImageUploaded] = useState();
+  const [isPersonal, setIsPersonal] = useState(false);
+  const [isProfessional, setIsProfessional] = useState(false);
 
   const handleChange = (event) => {
     setImageUploaded(event.target.files[0]);
@@ -24,6 +26,8 @@ const Upload = () => {
       formData.append("image", imageUploaded);
       formData.append("title", title);
       formData.append("description", description);
+      formData.append("personal", String(isPersonal));
+      formData.append("professional", String(isProfessional));
 
       await fetch("/api/image", {
         method: "POST",
@@ -61,7 +65,26 @@ const Upload = () => {
             placeholder="Description"
             rows={8}
             value={description}
-          />          
+          />
+
+          <div>
+            <label>
+              <input 
+                type="checkbox"
+                checked={isPersonal}
+                onChange={(e) => setIsPersonal(e.target.checked)}
+              />
+              Personal
+            </label>
+            <label>
+              <input 
+                type="checkbox"
+                checked={isProfessional}
+                onChange={(e) => setIsProfessional(e.target.checked)}
+              />
+              Professional
+            </label>
+          </div>
          
           <input type="submit" value="Upload" />
         
@@ -75,7 +98,9 @@ const Upload = () => {
           justify-content: center;
           align-items: center;
         }
-
+        label {
+          margin-right: 20px;
+        }
       `}</style>
     </Layout>
   );

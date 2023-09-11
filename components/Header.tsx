@@ -113,6 +113,9 @@ const Header: React.FC = () => {
                 <Link href="/" data-active={isActive("/")}>
                     Home
                 </Link>
+                <Link href="/personal" data-active={isActive("/personal")}>
+                    Personal
+                </Link>
             </BoldLink>
             {right}
         </Nav>

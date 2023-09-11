@@ -25,7 +25,15 @@ model Image {
   format      String
   version     String
   published   Boolean @default(false)
-  uploadDate  DateTime
+  uploadDate  String
+  personal    Boolean @default(false)
+  professional Boolean @default(false)
+}
+
+model Config {
+  id          String @id @default(cuid())
+  key         String @unique
+  value       String      
 }
 
 model Account {

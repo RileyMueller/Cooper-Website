@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
+import Router from "next/router";
 
 export type ImageProps = {
-  id: string;
-  c_id: string;
-  title: string;
-  description: string;
-  format: string;
-  version: string;
-  published: boolean;
-  uploadDate: string;
+  id:           string;
+  c_id:         string;
+  title:        string;
+  description:  string;
+  format:       string;
+  version:      string;
+  published:    boolean;
+  uploadDate:   string;
+  personal:     boolean;
+  professional: boolean;
 };
 
 type ImageStyleProps = {
@@ -54,25 +57,50 @@ const ImageWrapper = styled.div<ImageStyleProps>`
   }
 `;
 
-async function deleteImage(id: string): Promise<void> {
-    await fetch(`/api/image/${id}`, {
-        method: 'DELETE',
-    });
-}
 
-const Image: React.FC<{ image: ImageProps, width: string, height: string }> = ({ image, width, height }) => {  
-    const {data: session, status} = useSession();
-    const userHasValidSession = Boolean(session);
+const Image: React.FC<{ image: ImageProps, width: string, height: string, checkForSession?: Boolean }> = ({ image, width, height, checkForSession = true }) => { 
+  
+  const [retryCount, setRetryCount] = useState(0);
+  const [error, setError] = useState(false);
+  const {data: session} = useSession();
+  
+  const userHasValidSession = (()=>{
+    if (checkForSession) {
+      
+      return Boolean(session);
+    } else return false;
+  })();
+
+  const MAX_RETRIES = 3;
+  const url = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUD_NAME}/v${image.version}/${image.c_id}.${image.format}`;
+
+
+  const handleError = () => {
+    if (retryCount < MAX_RETRIES) {
+      setRetryCount(prevCount => prevCount + 1);
+    } else {
+      setError(true);
+    }
+  }
+
     
   return (
     <div>
         <ImageWrapper width={width} height={height}>
-      <img src={`https://res.cloudinary.com/${process.env.CLOUD_NAME}/v${image.version}/${image.c_id}.${image.format}`} />
+          {error ? 
+            <div>Error loading image</div> : 
+    
+            <img src={url} onError={handleError}/>
+          }
       <div className="info top">{image.title}</div>
       <div className="info bottom">{image.description}</div>
       
     </ImageWrapper>
-        {userHasValidSession && <button onClick={()=>deleteImage(image.id)}>Delete</button>}
+        {userHasValidSession && 
+          <button onClick={()=>{Router.push(`/i/${image.id}`)}}>
+            Edit Image
+          </button>
+        }
     </div>
     
   );
