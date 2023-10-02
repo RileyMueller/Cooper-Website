@@ -22,17 +22,23 @@ export default checkIsInSession(
                 res.status(200).json(value);
             }
             else if (req.method === 'PUT') {
-                if (req.body.key === 'homepage_picture_id') {
-                    await prisma.config.update({
-                        where: { key: 'homepage_picture_id'},
-                        data: {
+
+                try {
+                    await prisma.config.upsert({
+                        where: { key: req.body.key },
+                        update: {
+                            value: req.body.value
+                        },
+                        create: {
+                            key: req.body.key,
                             value: req.body.value
                         }
-                    })
+                    });
                     res.status(200).json({status: 'updated homepage picture'});
-                } else {
-                    res.status(500).json({error: 'config route for this key not supported'});
+                } catch (e) {
+                    res.status(500).json({error: 'Internal server error', msg: e.message});
                 }
+                
             } else {
                 res.status(500).json({error: 'config route for this http request type not supported'});
             }

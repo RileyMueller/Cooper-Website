@@ -10,7 +10,6 @@ export type ImageProps = {
   description:  string;
   format:       string;
   version:      string;
-  published:    boolean;
   uploadDate:   string;
   personal:     boolean;
   professional: boolean;
@@ -60,6 +59,12 @@ const ImageWrapper = styled.div<ImageStyleProps>`
 
 const Image: React.FC<{ image: ImageProps, width: string, height: string, checkForSession?: Boolean }> = ({ image, width, height, checkForSession = true }) => { 
   
+  if (!image) {
+    return <div>
+      No Image Provided
+    </div>
+  }
+
   const [retryCount, setRetryCount] = useState(0);
   const [error, setError] = useState(false);
   const {data: session} = useSession();

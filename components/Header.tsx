@@ -95,6 +95,11 @@ const Header: React.FC = () => {
                         Upload Image
                     </button>
                 </Link>
+                <Link href="/config" data-active={isActive("/config")}>
+                    <button>
+                        Config
+                    </button>
+                </Link>
                 <button onClick={() => signOut()}>
                     Log out
                 </button>
