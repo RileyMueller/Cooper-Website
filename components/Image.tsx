@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from 'styled-components';
-import { useSession } from 'next-auth/react';
-import Router from "next/router";
 
 export type ImageProps = {
   id:           string;
@@ -16,9 +14,20 @@ export type ImageProps = {
 };
 
 type ImageStyleProps = {
-    width: string,
-    height: string
+  width: string;
+  height: string;
 }
+
+type ImageComponentProps = {
+  image: ImageProps;
+  width: string;
+  height: string;
+  variant?: 'default' | 'homepage';
+}
+
+const ErrorMessage: React.FC = () => <div>
+  Error loading image
+</div>;
 
 const ImageWrapper = styled.div<ImageStyleProps>`
   position: relative;
@@ -57,8 +66,10 @@ const ImageWrapper = styled.div<ImageStyleProps>`
 `;
 
 
-const Image: React.FC<{ image: ImageProps, width: string, height: string, checkForSession?: Boolean }> = ({ image, width, height, checkForSession = true }) => { 
+const Image = (props: ImageComponentProps) => { 
   
+  const {image, width, height, variant} = props;
+
   if (!image) {
     return <div>
       No Image Provided
@@ -67,14 +78,7 @@ const Image: React.FC<{ image: ImageProps, width: string, height: string, checkF
 
   const [retryCount, setRetryCount] = useState(0);
   const [error, setError] = useState(false);
-  const {data: session} = useSession();
-  
-  const userHasValidSession = (()=>{
-    if (checkForSession) {
-      
-      return Boolean(session);
-    } else return false;
-  })();
+
 
   const MAX_RETRIES = 3;
   const url = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUD_NAME}/v${image.version}/${image.c_id}.${image.format}`;
@@ -90,23 +94,18 @@ const Image: React.FC<{ image: ImageProps, width: string, height: string, checkF
 
     
   return (
-    <div>
-        <ImageWrapper width={width} height={height}>
-          {error ? 
-            <div>Error loading image</div> : 
-    
-            <img src={url} onError={handleError}/>
-          }
-      <div className="info top">{image.title}</div>
-      <div className="info bottom">{image.description}</div>
-      
+    <ImageWrapper width={width} height={height}>
+      {error ? 
+        <ErrorMessage /> : 
+        <img src={url} onError={handleError}/>
+      }
+      {variant !== 'homepage' && (
+        <>
+          <div className="info top">{image.title}</div>
+          <div className="info bottom">{image.description}</div>
+        </>
+      )}
     </ImageWrapper>
-        {userHasValidSession && 
-          <button onClick={()=>{Router.push(`/i/${image.id}`)}}>
-            Edit Image
-          </button>
-        }
-    </div>
     
   );
 };

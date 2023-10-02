@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import Gallery from "../components/Gallery";
@@ -14,18 +13,25 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   });
 
-  const config = await prisma.config.findMany({});
+  const config = await prisma.config.findMany({
+    where: {
+      key: {
+        in: ['homepageImageId', 'homepageDescription']
+      }
+    }
+  });
+  
+  const imageConfig = config.find(item => item.key === 'homepageImageId');
+  const imageId = imageConfig?.value;
+  
+  const descConfig = config.find(item => item.key === 'homepageDescription');
+  const description = descConfig?.value || 'Need to set a description in /config';
+  
 
-  const imageJSON = config.find(item => item.key === 'homepageImageId');
-
-  const imageId = imageJSON ? imageJSON.value : null;
-
+  
   const homepageImage: ImageProps = imageId ? gallery.find(item => item.id === imageId) : null;
   
-  const descJSON = config.find(item => item.key === 'homepageDescription');
   
-  const description = descJSON ? descJSON.value : 'Need to set a description in /config';
-
   return {
     props: { gallery, description, homepageImage },
     revalidate: 10,
@@ -38,7 +44,7 @@ type Props = {
   homepageImage: ImageProps;
 };
 
-const Homepage: React.FC<Props> = (props) => {
+const Homepage = (props: Props) => {
   const personalImages = props.gallery.filter(image => image.personal);
   const professionalImages = props.gallery.filter(image => image.professional);
 
@@ -48,7 +54,7 @@ const Homepage: React.FC<Props> = (props) => {
         <p>
           {props.description}
         </p>
-        <Image image={props.homepageImage} width="400px" height="400px" />
+        <Image image={props.homepageImage} width="400px" height="400px" variant="homepage"/>
         <div>
           <h2>Personal Images</h2>
           <Gallery images={personalImages} />

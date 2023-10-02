@@ -100,7 +100,7 @@ const Edit: React.FC<Props> = (props) => {
                 <form onSubmit={submitData}>
                     <h1>Edit Image</h1>
 
-                    <Image image={props.image} width="200px" height="200px" checkForSession={false} />
+                    <Image image={props.image} width="200px" height="200px" />
 
                     <input
                         autoFocus

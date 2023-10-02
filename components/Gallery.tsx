@@ -2,18 +2,24 @@ import React from "react";
 import Image, { ImageProps } from "./Image";
 import styled from 'styled-components';
 
-const GalleryGrid = styled.div`
+interface GalleryProps {
+  images: ImageProps[];
+  minWidth?: string;
+  gap?: string;
+}
+
+const GalleryGrid = styled.div<{ minWidth: string, gap: string }>`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); // Adjust minmax values as needed
-  gap: 16px; // Adjust the gap as needed
+  grid-template-columns: repeat(auto-fill, minmax(${props => props.minWidth || '200px'}, 1fr));
+  gap: ${props => props.gap || '16px'};
   width: 100%;
 `;
 
-const Gallery: React.FC<{ images: ImageProps[] }> = ({ images }) => {
+const Gallery = ({ images, minWidth, gap }: GalleryProps) => {
   return (
-    <GalleryGrid>
-      {images.map((image, index) => (
-        <Image key={index} image={image} width="200px" height="200px" />
+    <GalleryGrid minWidth={minWidth} gap={gap}>
+      {images.map((image) => (
+        <Image key={image.id} image={image} width="200px" height="200px" />
       ))}
     </GalleryGrid>
   );
