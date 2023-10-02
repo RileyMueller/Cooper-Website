@@ -1,6 +1,4 @@
-import { resolve } from 'path';
 import prisma from '../../../lib/prisma';
-import { IncomingForm } from "formidable";
 import { uploadImage } from '../../../lib/cloudinary';
 import { parseImageForm } from '../../../lib/imageparse';
 import { checkIsInSession } from '../auth/[...nextauth]';
@@ -28,7 +26,6 @@ export default checkIsInSession( async (req, res) => {
         description: x.fields.description[0],
         format: imageData.format,
         version: imageData.version.toString(),
-        published: true,
         uploadDate: (new Date()).toISOString(),
         personal: x.fields.personal[0] === 'true', //FormData converts booleans to strings.
         professional: x.fields.professional[0] === 'true'
